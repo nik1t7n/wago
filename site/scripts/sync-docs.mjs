@@ -14,7 +14,7 @@ const repo = 'https://github.com/nik1t7n/wago';
 // page slug -> where its text comes from
 const pages = [
   { slug: 'getting-started', title: 'Getting started', from: 'README.md',
-    sections: ['Quickstart', 'One turn, start to finish', 'Plug in any agent', 'Make it yours'] },
+    sections: ['Quickstart', 'One turn, start to finish', 'Plug in any agent', 'Make it yours'], intro: 'Quickstart' },
   { slug: 'for-agents', title: 'For AI agents', from: 'AGENTS.md' },
   { slug: 'examples', title: 'Examples', from: 'examples/README.md' },
   { slug: 'agent-layer', title: 'The agent layer', from: 'docs/AGENT-LAYER.md' },
@@ -73,6 +73,8 @@ copyFileSync(join(root, 'site', 'src', 'landing.mdx'), join(out, 'index.mdx'));
 
 for (const p of pages) {
   let body = p.sections ? sections(read(p.from), p.sections) : dropTitle(read(p.from));
+  // the page title already says it: the first section's heading goes, its subsections move up a level
+  if (p.intro) body = body.replace(/^## .*\n+([\s\S]*?)(?=^## |$(?![\s\S]))/m, (_, s) => s.replace(/^### /gm, '## '));
   body = links(body, p.from);
   if (p.prepend) body = links(sections(read(p.prepend.from), p.prepend.sections), p.prepend.from) + '\n\n' + body;
   const front = `---\ntitle: ${yaml(p.title)}\neditUrl: ${yaml(`${repo}/edit/main/${p.from}`)}\n---\n\n`;

@@ -1,34 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="960" height="300" role="img" aria-label="Timeline of one turn: three messages gather, the turn is ready after a quiet window, the agent replies, WaGo marks read, types and sends two parts">
   <style>
-    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, sans-serif; fill: #0f172a; }
-    .muted { fill: #64748b; } .xs { font-size: 11.5px; } .s { font-size: 13px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+    text { font-family: "Golos Text", "Onest", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #13191d; }
+    .muted { fill: #56626a; } .xs { font-size: 11.5px; } .s { font-size: 13px; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
   
-    .f-accent { fill: #0ea5e9; }
-    .f-accent2 { fill: #e0f2fe; }
+    .f-accent { fill: #0f7b6c; }
+    .f-accent2 { fill: #e1f1ee; }
     .f-amber { fill: #f59e0b; }
     .f-bg { fill: #ffffff; }
-    .f-card { fill: #f8fafc; }
-    .f-violet { fill: #8b5cf6; }
+    .f-card { fill: #f7f9fa; }
+    .f-violet { fill: #475569; }
     .f-wa2 { fill: #dcf8c6; }
-    .s-accent { stroke: #0ea5e9; }
+    .s-accent { stroke: #0f7b6c; }
     .s-amber { stroke: #f59e0b; }
-    .s-line { stroke: #cbd5e1; }
-    .s-violet { stroke: #8b5cf6; }
+    .s-line { stroke: #c9d2d7; }
+    .s-violet { stroke: #475569; }
     @media (prefers-color-scheme: dark) {
-      text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, sans-serif; fill: #e6edf3; }
-      .muted { fill: #8b949e; }
-      .f-accent { fill: #38bdf8; }
-      .f-accent2 { fill: #0c2a3a; }
+      text { font-family: "Golos Text", "Onest", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #e9eef0; }
+      .muted { fill: #97a4ab; }
+      .f-accent { fill: #5cd0b8; }
+      .f-accent2 { fill: #12302b; }
       .f-amber { fill: #fbbf24; }
-      .f-bg { fill: #0d1117; }
-      .f-card { fill: #161b22; }
-      .f-violet { fill: #a78bfa; }
+      .f-bg { fill: #172024; }
+      .f-card { fill: #1d272c; }
+      .f-violet { fill: #97a4ab; }
       .f-wa2 { fill: #103322; }
-      .s-accent { stroke: #38bdf8; }
+      .s-accent { stroke: #5cd0b8; }
       .s-amber { stroke: #fbbf24; }
-      .s-line { stroke: #30363d; }
-      .s-violet { stroke: #a78bfa; }
+      .s-line { stroke: #2f3b41; }
+      .s-violet { stroke: #97a4ab; }
     }
   </style>
   <rect class="f-bg" width="960" height="300"/>
