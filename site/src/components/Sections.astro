@@ -1,0 +1,139 @@
+---
+// The landing page below the hero: what WaGo takes off your hands, the whole contract, and the agent-first path.
+import { Code, LinkButton } from '@astrojs/starlight/components';
+
+const groups = [
+  {
+    name: 'Conversation',
+    items: [
+      ['Turns, not messages', 'Bursts, voice notes and typing become one turn.ready. A new message supersedes it.'],
+      ['Types like a person', 'Read receipts, "typing…" sized to the words, the answer in parts with natural pauses.'],
+      ['People come first', 'Answer from your phone and the agent steps back, then returns after a quiet spell.'],
+    ],
+  },
+  {
+    name: 'Reliability',
+    items: [
+      ['A durable outbox', 'Survives restarts, retries with the same WhatsApp id, keeps per-chat order.'],
+      ['Every message, instantly', 'Full history in SQLite with full-text search. Reads in milliseconds, even offline.'],
+      ['Featherweight', 'One native Go process at about 21 MB of RAM. No browser, no Node.'],
+    ],
+  },
+  {
+    name: 'Safety',
+    items: [
+      ['Number protection', 'Rate and new-chat limits, quiet hours, cold-outreach block, allow and block lists.'],
+      ['A kill switch', 'One call stops every send. Early warnings when people start blocking you.'],
+      ['Rehearsals', 'Shadow mode on live traffic, replays of real days at 100x, scripted chats for CI.'],
+    ],
+  },
+];
+
+const event = `{
+  "event": "turn.ready",
+  "payload": {
+    "turn": { "id": "t_3f1c…", "chatId": "15551234567@c.us" },
+    "context": [
+      { "role": "user", "name": "Ann", "text": "hi" },
+      { "role": "user", "text": "do you deliver on sunday?" },
+      { "role": "user", "text": "[audio] can I pay by card?" }
+    ]
+  }
+}`;
+const reply = `POST /api/default/turns/t_3f1c…/reply
+
+{ "parts": [
+    { "text": "Hi Ann! Yes, Sundays 10 to 18." },
+    { "text": "Card or cash, both fine 🙂" }
+] }`;
+const prompt = `Set up WaGo (https://github.com/nik1t7n/wago) for me. Read its AGENTS.md first and follow its rules.
+Run it with -dev-fake, connect my agent's webhook to turn.ready, and prove the loop with /dev/incoming.
+Then show me how to link my phone. Do not turn on sending or message real people without asking me.`;
+---
+
+<section class="wg-sec not-content">
+  <h2>Everything around the model, solved once</h2>
+  <div class="wg-groups">
+    {groups.map((g) => (
+      <div class="wg-group">
+        <p class="wg-label">{g.name}</p>
+        <ul>
+          {g.items.map(([t, d]) => (
+            <li><strong>{t}</strong><span>{d}</span></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="wg-sec not-content">
+  <h2>One event in, one call out</h2>
+  <p class="wg-lead">Timing, typing, retries, ordering, takeover and limits are WaGo's job. Your agent only decides what to say.</p>
+  <div class="wg-pair">
+    <div><p class="wg-label">Your webhook receives</p><Code code={event} lang="json" /></div>
+    <div><p class="wg-label">Your agent answers</p><Code code={reply} lang="http" /></div>
+  </div>
+</section>
+
+<section class="wg-sec wg-agents not-content">
+  <div>
+    <h2>Built for agents to drive</h2>
+    <p class="wg-lead">The <a href="/wago/for-agents/">For AI agents</a> page is written for models: setup, rules, the reply contract and troubleshooting on one page. <a href="/wago/llms.txt">llms.txt</a> indexes the rest. Hand your coding agent this:</p>
+  </div>
+  <Code code={prompt} lang="text" wrap />
+</section>
+
+<section class="wg-cta not-content">
+  <p>Up and answering in a few minutes, no phone needed to try it.</p>
+  <div>
+    <LinkButton href="/wago/getting-started/" icon="right-arrow">Get started</LinkButton>
+    <LinkButton href="https://github.com/nik1t7n/wago" variant="minimal" icon="github" iconPlacement="start">Star on GitHub</LinkButton>
+  </div>
+</section>
+
+<style>
+  .wg-sec { margin-top: clamp(3rem, 7vw, 5.5rem); display: grid; gap: 1.25rem; }
+  .wg-sec h2 { margin: 0; color: var(--sl-color-white); font-weight: 650; font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.1rem); letter-spacing: -0.025em; }
+  .wg-lead { margin: 0; line-height: 1.6; max-width: 40rem; color: var(--sl-color-gray-3); }
+  .wg-lead a { color: var(--sl-color-accent); text-underline-offset: 3px; }
+  .wg-label { margin: 0 0 0.6rem; font: 500 0.75rem/1 var(--sl-font-mono); color: var(--sl-color-accent); letter-spacing: 0.02em; }
+
+  .wg-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--wg-radius, 14px);
+    overflow: hidden;
+  }
+  .wg-group { padding: 1.4rem 1.4rem 1.2rem; min-width: 0; }
+  .wg-group + .wg-group { border-inline-start: 1px solid var(--sl-color-gray-5); }
+  @media (max-width: 52rem) { .wg-group + .wg-group { border-inline-start: 0; border-top: 1px solid var(--sl-color-gray-5); } }
+  .wg-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.05rem; }
+  .wg-group li { display: grid; gap: 0.2rem; margin: 0; }
+  .wg-group strong { font: 600 1rem/1.3 var(--wg-display); color: var(--sl-color-white); }
+  .wg-group span { font-size: 0.9rem; line-height: 1.5; color: var(--sl-color-gray-3); }
+
+  .wg-pair { display: grid; gap: 1rem; }
+  @media (min-width: 60rem) { .wg-pair { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); } }
+  .wg-pair > div { min-width: 0; }
+  .wg-pair :global(.expressive-code) { margin: 0; }
+
+  .wg-agents { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  @media (min-width: 60rem) { .wg-agents { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 2.5rem; } }
+  .wg-agents :global(.expressive-code) { margin: 0; }
+
+  .wg-cta {
+    margin-top: clamp(3rem, 7vw, 5rem);
+    padding: 1.6rem 1.8rem;
+    border-radius: var(--wg-radius, 14px);
+    background: var(--sl-color-accent-low);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .wg-cta p { margin: 0; font: 600 1.15rem/1.35 var(--wg-display); color: var(--sl-color-white); }
+  .wg-cta div { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; align-items: center; }
+</style>

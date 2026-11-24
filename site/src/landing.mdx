@@ -4,69 +4,16 @@ description: Agent-first WhatsApp API in a single 21 MB Go binary.
 template: splash
 hero:
   title: Put your AI agent on WhatsApp.
-  tagline: It will text like a person. One tiny Go binary turns message bursts and voice notes into clean turns, types replies out like a human, steps aside when you answer from your phone, and never loses a message.
+  tagline: It texts like a person. WaGo gathers message bursts and voice notes into one turn, types the answer out naturally, steps aside when you reply from your phone, and never loses a message.
   actions:
     - text: Get started
       link: /wago/getting-started/
       icon: right-arrow
     - text: For AI agents
       link: /wago/for-agents/
-      icon: rocket
       variant: secondary
-    - text: GitHub
-      link: https://github.com/nik1t7n/wago
-      icon: external
-      variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import Sections from '../../components/Sections.astro';
 
-<img src="/wago/assets/hero.svg" alt="WhatsApp on a phone linked to WaGo, which runs the agent layer and a full message history and hands your agent one event per turn" />
-
-## Everything around the model, solved once
-
-<CardGrid>
-  <Card title="Turns, not messages" icon="comment">
-    Bursts, voice notes and typing become one `turn.ready`. A new message supersedes the turn, so your agent answers everything at once.
-  </Card>
-  <Card title="Texts like a human" icon="pencil">
-    Read receipts, "typing…" sized to the words, replies in natural parts with jittered pauses. It stops when the person starts writing again.
-  </Card>
-  <Card title="Humans always win" icon="approve-check">
-    Answer from your phone and the agent steps back on its own, then returns after a quiet spell.
-  </Card>
-  <Card title="Never loses a reply" icon="list-format">
-    A durable outbox survives restarts, retries with the same WhatsApp id, keeps per-chat order and says why anything waits.
-  </Card>
-  <Card title="Hears and sees" icon="magnifier">
-    Voice notes and photos arrive as text through Whisper, any vision model, your own service or a local command.
-  </Card>
-  <Card title="Keeps the number safe" icon="warning">
-    Limits, quiet hours, cold-outreach block, a kill switch and early warnings when people start blocking you.
-  </Card>
-  <Card title="Rehearse before you ship" icon="star">
-    Shadow mode on live traffic, replays of real days at 100x, and scripted conversations for your agent's CI.
-  </Card>
-  <Card title="Featherweight" icon="rocket">
-    One native Go process, about 21 MB of RAM, full history in SQLite with full-text search.
-  </Card>
-</CardGrid>
-
-## One event in, one call out
-
-```http
-POST /api/default/turns/t_3f1c…/reply
-{"parts": [{"text": "Hi Ann!"}, {"text": "Yes, card or cash on delivery."}]}
-```
-
-Timing, typing, read receipts, retries, ordering, takeover and limits are WaGo's job. [See a whole turn](/wago/getting-started/#one-turn-start-to-finish).
-
-## Built for agents to drive
-
-The [For AI agents](/wago/for-agents/) page is written for models, and [`llms.txt`](/wago/llms.txt) indexes the docs. Hand your coding agent this:
-
-```text
-Set up WaGo (https://github.com/nik1t7n/wago) for me. Read its AGENTS.md first and follow its rules.
-Run it with -dev-fake, connect my agent's webhook to turn.ready, and prove the loop with /dev/incoming.
-Then show me how to link my phone. Do not turn on sending or message real people without asking me.
-```
+<Sections />

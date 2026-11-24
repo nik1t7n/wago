@@ -9,6 +9,9 @@
   --sl-font: 'Golos Text Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --sl-font-mono: 'JetBrains Mono Variable', ui-monospace, Menlo, monospace;
   --wg-radius: 14px;
+  --wg-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --wg-human: #e2b04a;
+  --wg-human-soft: #342912;
 
   /* dark (Starlight's default) */
   --sl-color-accent-low: #12302b;
@@ -39,6 +42,8 @@
   --sl-color-black: #ffffff;
   --sl-color-bg-nav: #f4f6f7;
   --sl-color-bg-sidebar: #f4f6f7;
+  --wg-human: #8f5f00;
+  --wg-human-soft: #fbf0d6;
 }
 
 /* type */
@@ -66,14 +71,26 @@ h1, h2, h3, h4, .site-title, .hero h1, .card .title, .sl-markdown-content :is(h1
 .sl-markdown-content tr:nth-child(2n) { background: transparent; }
 .sl-markdown-content img[src$='.svg'] { border: 1px solid var(--sl-color-gray-5); }
 
-/* cards: one accent instead of a rainbow */
-.card-grid > .card:nth-child(n) {
-  --sl-card-border: var(--sl-color-accent);
-  --sl-card-bg: var(--sl-color-accent-low);
-  border: 1px solid var(--sl-color-gray-5);
-  background: var(--sl-color-black);
+/* micro-interactions, as in our product UI: colour in .15s, a small press, a clear keyboard focus */
+.sl-link-button {
+  border-radius: 999px;
+  font-family: var(--wg-display);
+  font-weight: 600;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.15s var(--wg-ease);
 }
-.card .title { font-weight: 600; }
+.sl-link-button:active { transform: scale(0.97); }
+.sl-link-button.primary:hover { background: var(--sl-color-accent-high); border-color: var(--sl-color-accent-high); }
+:root[data-theme='light'] .sl-link-button.primary:hover { background: var(--sl-color-accent-high); color: #fff; }
+.sidebar-content a, .right-sidebar a, .pagination-links a, .sl-markdown-content a, header a, header button {
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+}
+.pagination-links a { border-radius: var(--wg-radius); }
+.pagination-links a:active { transform: scale(0.99); }
+:is(a, button, summary, [tabindex]):focus-visible { outline: 2px solid var(--sl-color-accent); outline-offset: 3px; border-radius: 6px; }
+.sl-markdown-content :is(h2, h3) { scroll-margin-top: 5rem; }
+html { scroll-behavior: smooth; }
 
-/* buttons */
-.sl-link-button { border-radius: 999px; font-family: var(--wg-display); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}

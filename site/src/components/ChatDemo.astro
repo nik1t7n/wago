@@ -1,0 +1,345 @@
+---
+// WaGo at work, played as a short chat: three scenarios of what the agent layer does. Vanilla script, no framework;
+// it runs only while on screen and the tab is visible, and with reduced motion it shows each scenario's end state.
+---
+
+<figure class="wg-demo" aria-label="WaGo at work: an example chat">
+  <div class="wg-bar">
+    <div class="wg-tabs" role="tablist" aria-label="Scenario">
+      <span class="wg-ind" aria-hidden="true"></span>
+      <button role="tab" aria-selected="true" data-s="burst">Bursts</button>
+      <button role="tab" aria-selected="false" data-s="interrupt">Interruption</button>
+      <button role="tab" aria-selected="false" data-s="takeover">Takeover</button>
+    </div>
+    <button class="wg-replay" type="button" aria-label="Play again" title="Play again">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 0 1.8-4.07M4.5 3.5v3h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="wg-phone" aria-hidden="true">
+    <header>
+      <span class="wg-ava">A</span>
+      <span class="wg-who"><b>Ann</b><span class="wg-status">online</span></span>
+      <span class="wg-state">listening</span>
+    </header>
+    <div class="wg-msgs"></div>
+  </div>
+
+  <ol class="wg-log" aria-hidden="true"></ol>
+  <p class="sr-only wg-sr"></p>
+</figure>
+
+<script>
+  type Op = [number, string, ...unknown[]];
+  const scenarios: Record<string, { sr: string; steps: Op[] }> = {
+    burst: {
+      sr: 'Ann sends three quick messages, one of them a voice note. WaGo waits until she stops, transcribes the voice note and hands the agent one turn; the reply arrives in two typed parts.',
+      steps: [
+        [500, 'in', 'hi'],
+        [800, 'in', 'do you deliver on sunday?'],
+        [400, 'typing', true], [0, 'state', 'gathering · 2'],
+        [1300, 'typing', false], [0, 'voice', '0:05', 'can I pay by card?'], [0, 'ev', 'voice → text', 'transcribed'],
+        [0, 'state', 'quiet…'],
+        [1300, 'ev', 'turn.ready', '3 messages, 1 event'], [0, 'state', 'turn.ready'],
+        [700, 'state', 'read ✓✓'],
+        [500, 'agent', true], [0, 'state', 'typing 1/2'],
+        [1500, 'agent', false], [0, 'out', 'Hi Ann! Yes, Sundays 10 to 18.'],
+        [650, 'agent', true], [0, 'state', 'typing 2/2'],
+        [1200, 'agent', false], [0, 'out', 'Card or cash, both fine 🙂'], [0, 'ev', 'outbox.sent', '2 parts'], [0, 'state', 'sent'],
+      ],
+    },
+    interrupt: {
+      sr: 'Ann asks a question; while the second part of the answer is being typed she writes again. WaGo stops, supersedes the turn and the agent answers both messages at once.',
+      steps: [
+        [500, 'in', 'how much is a large box?'],
+        [1300, 'ev', 'turn.ready', '1 message'], [0, 'state', 'turn.ready'],
+        [500, 'agent', true], [0, 'state', 'typing 1/2'],
+        [1300, 'agent', false], [0, 'out', 'A large box is $24.'],
+        [550, 'agent', true], [0, 'state', 'typing 2/2'],
+        [700, 'typing', true],
+        [900, 'typing', false], [0, 'agent', false], [0, 'in', 'and a small one?'],
+        [0, 'ev', 'turn.superseded', 'rest of the reply stopped'], [0, 'state', 'superseded'],
+        [1300, 'ev', 'turn.ready', '2 messages carried over'], [0, 'state', 'turn.ready'],
+        [500, 'agent', true], [0, 'state', 'typing'],
+        [1300, 'agent', false], [0, 'out', 'Small is $15, large $24.'], [0, 'ev', 'outbox.sent', '1 part'], [0, 'state', 'sent'],
+      ],
+    },
+    takeover: {
+      sr: 'While the agent is typing, the owner answers from the phone. The chat becomes theirs, the agent steps back, and new messages wait for the person.',
+      steps: [
+        [500, 'in', 'can I get a discount for 10 boxes?'],
+        [1300, 'ev', 'turn.ready', '1 message'], [0, 'state', 'turn.ready'],
+        [500, 'agent', true], [0, 'state', 'typing'],
+        [1300, 'agent', false], [0, 'own', 'Sure, 10% for you, Ann!'],
+        [0, 'ev', 'chat.owner', 'human, from the phone'], [0, 'state', 'human owns'],
+        [1000, 'ev', 'reply → 409', 'the agent steps back'],
+        [1200, 'in', 'thanks!!'],
+        [700, 'state', 'human · back in 30 min'],
+      ],
+    },
+  };
+  const order = Object.keys(scenarios);
+  // a voice note's waveform: fixed bar heights, drawn once
+  const WAVE = `<svg class="wg-wave" viewBox="0 0 44 16" aria-hidden="true">${[5, 9, 13, 7, 11, 15, 9, 5, 12, 8, 14, 6, 10, 4, 8]
+    .map((h, i) => `<rect x="${i * 3}" y="${(16 - h) / 2}" width="1.6" height="${h}" rx=".8" fill="currentColor"/>`).join('')}</svg>`;
+
+  for (const root of document.querySelectorAll<HTMLElement>('.wg-demo')) {
+    const $ = <T extends Element>(s: string) => root.querySelector(s) as T;
+    const msgs = $<HTMLElement>('.wg-msgs');
+    const log = $<HTMLOListElement>('.wg-log');
+    const status = $<HTMLElement>('.wg-status');
+    const state = $<HTMLElement>('.wg-state');
+    const sr = $<HTMLElement>('.wg-sr');
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const ind = $<HTMLElement>('.wg-ind');
+    const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+    let current = 'burst', step = 0, timer = 0, visible = false, done = false;
+
+    const fade = (el: HTMLElement) => { if (!still.matches) el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: 'ease-out' }); };
+    const setText = (el: HTMLElement, t: string) => { if (el.textContent !== t) { el.textContent = t; fade(el); } };
+
+    // a row grows open (grid rows 0fr → 1fr), so earlier messages glide up instead of jumping
+    function row(cls: string, html: string) {
+      const r = document.createElement('div');
+      r.className = `wg-row ${cls}`;
+      r.innerHTML = `<div class="wg-in">${html}</div>`;
+      msgs.append(r);
+      if (still.matches) r.classList.add('on');
+      else requestAnimationFrame(() => requestAnimationFrame(() => r.classList.add('on')));
+      while (msgs.children.length > 7) msgs.firstElementChild!.remove();
+      return r;
+    }
+    function drop(r: Element | null) {
+      if (!r) return;
+      if (still.matches) return r.remove();
+      r.classList.remove('on');
+      setTimeout(() => r.remove(), 320);
+    }
+    const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+    const ops: Record<string, (...a: any[]) => void> = {
+      in: (t: string) => row('them', `<p class="wg-b">${esc(t)}</p>`),
+      voice: (len: string, text: string) => row('them', `<p class="wg-b wg-voice"><span class="wg-play"></span>${WAVE}<span class="wg-len">${len}</span><em>${esc(text)}</em></p>`),
+      out: (t: string) => row('us', `<p class="wg-b">${esc(t)}<span class="wg-tick">✓✓</span></p>`),
+      own: (t: string) => row('us own', `<p class="wg-b"><span class="wg-by">You · phone</span>${esc(t)}</p>`),
+      typing: (on: boolean) => setText(status, on ? 'typing…' : 'online'),
+      agent: (on: boolean) => on ? row('us dots', '<p class="wg-b"><i></i><i></i><i></i></p>') : drop(msgs.querySelector('.dots.on, .dots')),
+      state: (t: string) => setText(state, t),
+      ev: (name: string, detail: string) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<code>${esc(name)}</code><span>${esc(detail)}</span>`;
+        log.prepend(li);
+        if (!still.matches) li.animate([{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        while (log.children.length > 3) log.lastElementChild!.remove();
+      },
+    };
+
+    function reset() {
+      clearTimeout(timer);
+      msgs.replaceChildren(); log.replaceChildren();
+      status.textContent = 'online'; state.textContent = 'listening';
+      step = 0; done = false;
+      sr.textContent = scenarios[current].sr;
+    }
+    function select(name: string, focus = false) {
+      current = name;
+      tabs.forEach((t) => { const on = t.dataset.s === name; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+      moveInd();
+      reset();
+      if (still.matches) { for (const [, op, ...a] of scenarios[current].steps) ops[op](...a); done = true; }
+      else if (visible) tick();
+    }
+    function tick() {
+      const steps = scenarios[current].steps;
+      if (step >= steps.length) {
+        done = true;
+        timer = window.setTimeout(() => select(order[(order.indexOf(current) + 1) % order.length]), 2600);
+        return;
+      }
+      const [wait, op, ...a] = steps[step];
+      timer = window.setTimeout(() => { ops[op](...a); step++; tick(); }, wait);
+    }
+    function moveInd() {
+      const t = tabs.find((x) => x.dataset.s === current)!;
+      ind.style.width = `${t.offsetWidth}px`;
+      ind.style.transform = `translateX(${t.offsetLeft - 3}px)`;
+    }
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t.dataset.s!));
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length].dataset.s!, true); }
+      });
+    });
+    $<HTMLButtonElement>('.wg-replay').addEventListener('click', () => select(current));
+    new ResizeObserver(moveInd).observe(root);
+
+    // play only while someone can see it
+    const play = () => { if (!still.matches && visible && !document.hidden) { clearTimeout(timer); if (done) select(current); else tick(); } };
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) play(); else clearTimeout(timer); }, { threshold: 0.3 }).observe(root);
+    document.addEventListener('visibilitychange', () => (document.hidden ? clearTimeout(timer) : play()));
+    root.classList.add('ready');
+    select(current);
+  }
+</script>
+
+<style>
+  .wg-demo {
+    margin: 0;
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+    --wg-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .wg-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+
+  /* segmented control with a sliding indicator, as in our product UI */
+  .wg-tabs {
+    position: relative;
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    background: var(--sl-color-gray-6);
+  }
+  .wg-ind {
+    position: absolute;
+    inset: 3px auto 3px 3px;
+    width: 0;
+    border-radius: 999px;
+    background: var(--sl-color-black);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.12), 0 0 0 1px var(--sl-color-gray-5);
+    transition: transform 0.42s cubic-bezier(0.34, 1.28, 0.64, 1), width 0.42s cubic-bezier(0.34, 1.28, 0.64, 1);
+  }
+  .wg-tabs button {
+    position: relative;
+    border: 0;
+    background: none;
+    padding: 0.38rem 0.85rem;
+    border-radius: 999px;
+    font: 500 0.82rem/1 var(--sl-font);
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .wg-tabs button:hover, .wg-tabs button[aria-selected='true'] { color: var(--sl-color-white); }
+  .wg-tabs button:active { transform: scale(0.97); }
+  .wg-replay {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 999px;
+    background: var(--sl-color-black);
+    color: var(--sl-color-gray-3);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .wg-replay svg { width: 1rem; height: 1rem; }
+  .wg-replay:hover { color: var(--sl-color-accent); border-color: var(--sl-color-accent); }
+  .wg-replay:active { transform: scale(0.94); }
+  .wg-demo :is(button):focus-visible { outline: 2px solid var(--sl-color-accent); outline-offset: 2px; }
+
+  /* the chat */
+  .wg-phone {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: var(--wg-radius, 14px);
+    background: var(--sl-color-black);
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 32px -18px rgb(0 0 0 / 0.25);
+  }
+  .wg-phone header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  .wg-ava {
+    display: grid; place-items: center;
+    width: 2rem; height: 2rem; border-radius: 50%;
+    background: var(--sl-color-accent-low); color: var(--sl-color-accent);
+    font: 600 0.85rem/1 var(--wg-display);
+  }
+  .wg-who { display: grid; line-height: 1.2; }
+  .wg-who b { font: 600 0.92rem/1.2 var(--wg-display); color: var(--sl-color-white); }
+  .wg-status { font-size: 0.75rem; color: var(--sl-color-gray-3); }
+  .wg-state {
+    margin-inline-start: auto;
+    font: 500 0.72rem/1 var(--sl-font-mono);
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-accent);
+    white-space: nowrap;
+  }
+
+  .wg-msgs {
+    height: 18rem;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, transparent 0, #000 3rem);
+  }
+  /* rows and log lines are created by the script, so their rules are global under the scoped containers */
+  .wg-msgs :global(.wg-row) {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.32s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.28s ease-out;
+  }
+  .wg-msgs :global(.wg-row.on) { grid-template-rows: 1fr; opacity: 1; }
+  .wg-msgs :global(.wg-in) { min-height: 0; overflow: hidden; display: flex; }
+  .wg-msgs :global(.us .wg-in) { justify-content: flex-end; }
+  .wg-msgs :global(.wg-b) {
+    margin: 0.2rem 0;
+    max-width: 82%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 14px 14px 14px 4px;
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    transform: translateY(6px);
+    transition: transform 0.32s var(--wg-ease);
+  }
+  .wg-msgs :global(.wg-row.on .wg-b) { transform: none; }
+  .wg-msgs :global(.us .wg-b) { border-radius: 14px 14px 4px 14px; background: var(--sl-color-accent-low); }
+  .wg-msgs :global(.own .wg-b) { background: var(--wg-human-soft); }
+  .wg-msgs :global(.wg-by) { display: block; font-size: 0.7rem; font-weight: 600; color: var(--wg-human); margin-bottom: 0.1rem; }
+  .wg-msgs :global(.wg-tick) { margin-inline-start: 0.4rem; font-size: 0.7rem; color: var(--sl-color-accent); letter-spacing: -0.15em; }
+  .wg-msgs :global(.wg-voice) { display: grid; grid-template-columns: auto auto 1fr; align-items: center; column-gap: 0.55rem; min-width: 12rem; }
+  .wg-msgs :global(.wg-play) { width: 0; height: 0; border-block: 5px solid transparent; border-inline-start: 8px solid var(--sl-color-accent); }
+  .wg-msgs :global(.wg-wave) { display: block; width: 5.5rem; height: 1rem; color: var(--sl-color-gray-3); }
+  .wg-msgs :global(.wg-len) { font: 500 0.72rem/1 var(--sl-font-mono); color: var(--sl-color-gray-3); }
+  .wg-msgs :global(.wg-voice em) {
+    grid-column: 1 / -1;
+    margin-top: 0.35rem; padding-top: 0.35rem;
+    border-top: 1px dashed var(--sl-color-gray-5);
+    font-size: 0.82rem; color: var(--sl-color-gray-2);
+  }
+  .wg-msgs :global(.dots .wg-b) { display: flex; gap: 4px; padding: 0.7rem 0.8rem; }
+  .wg-msgs :global(.dots i) { width: 6px; height: 6px; border-radius: 50%; background: var(--sl-color-accent); animation: wg-dot 1.2s infinite ease-in-out; }
+  .wg-msgs :global(.dots i:nth-child(2)) { animation-delay: 0.15s; }
+  .wg-msgs :global(.dots i:nth-child(3)) { animation-delay: 0.3s; }
+  @keyframes wg-dot { 0%, 60%, 100% { opacity: 0.25; transform: none; } 30% { opacity: 1; transform: translateY(-2px); } }
+
+  /* the events WaGo raises, newest first */
+  .wg-log { list-style: none; margin: 0; padding: 0 0.25rem; display: grid; align-content: start; gap: 0.35rem; min-height: 4.4rem; }
+  .wg-log :global(li) { margin: 0; display: flex; gap: 0.6rem; align-items: baseline; font-size: 0.8rem; line-height: 1.3; color: var(--sl-color-gray-3); }
+  .wg-log :global(li + li) { opacity: 0.6; }
+  .wg-log :global(li + li + li) { opacity: 0.35; }
+  .wg-log :global(code) { font: 500 0.76rem/1.3 var(--sl-font-mono); color: var(--sl-color-accent); background: none; padding: 0; white-space: nowrap; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wg-ind, .wg-msgs :global(:is(.wg-row, .wg-b)) { transition: none; }
+    .wg-msgs :global(.dots i) { animation: none; opacity: 0.6; }
+  }
+</style>

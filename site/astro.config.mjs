@@ -9,6 +9,8 @@ export default defineConfig({
   base: '/wago',
   integrations: [
     starlight({
+      // code frames share the identity's radius and type everywhere, landing page included
+      expressiveCode: { styleOverrides: { borderRadius: '14px', codeFontFamily: "'JetBrains Mono Variable', ui-monospace, Menlo, monospace" } },
       title: 'WaGo',
       description: 'Agent-first WhatsApp API in a single 21 MB Go binary.',
       logo: { light: '../docs/assets/logo.svg', dark: '../docs/assets/logo-dark.svg', replacesTitle: false },
@@ -16,6 +18,7 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: repo }],
       editLink: { baseUrl: `${repo}/edit/main/` },
       customCss: ['./src/styles/theme.css'],
+      components: { Hero: './src/components/Hero.astro' },
       lastUpdated: false,
       sidebar: [
         { label: 'Start', items: ['getting-started', 'for-agents', 'examples'] },
