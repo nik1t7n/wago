@@ -28,6 +28,14 @@ export default defineConfig({
       description: 'Agent-first WhatsApp API in a single 21 MB Go binary.',
       logo: { light: '../docs/assets/logo.svg', dark: '../docs/assets/logo-dark.svg', replacesTitle: false },
       favicon: '/favicon.svg',
+      // the card a shared link shows on X, LinkedIn, Telegram and Slack
+      head: [
+        { tag: 'meta', attrs: { property: 'og:image', content: 'https://nik1t7n.github.io/wago/og.png' } },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'WaGo: put your AI agent on WhatsApp' } },
+        { tag: 'meta', attrs: { name: 'twitter:image', content: 'https://nik1t7n.github.io/wago/og.png' } },
+      ],
       social: [{ icon: 'github', label: 'GitHub', href: repo }],
       editLink: { baseUrl: `${repo}/edit/main/` },
       customCss: ['./src/styles/theme.css'],
