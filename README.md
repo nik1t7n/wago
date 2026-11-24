@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img src="docs/assets/logo.svg" alt="" width="72" height="72">
+  </picture>
+</p>
+
 <h1 align="center">WaGo</h1>
 
 <p align="center"><b>Put your AI agent on WhatsApp. It will text like a person.</b></p>

@@ -11,7 +11,7 @@ export default defineConfig({
     starlight({
       title: 'WaGo',
       description: 'Agent-first WhatsApp API in a single 21 MB Go binary.',
-      logo: { src: './src/assets/logo.svg', replacesTitle: false },
+      logo: { light: '../docs/assets/logo.svg', dark: '../docs/assets/logo-dark.svg', replacesTitle: false },
       favicon: '/favicon.svg',
       social: [{ icon: 'github', label: 'GitHub', href: repo }],
       editLink: { baseUrl: `${repo}/edit/main/` },
