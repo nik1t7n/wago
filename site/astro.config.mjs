@@ -10,7 +10,20 @@ export default defineConfig({
   integrations: [
     starlight({
       // code frames share the identity's radius and type everywhere, landing page included
-      expressiveCode: { styleOverrides: { borderRadius: '14px', codeFontFamily: "'JetBrains Mono Variable', ui-monospace, Menlo, monospace" } },
+      expressiveCode: {
+        // long commands wrap instead of running off the page; shell blocks drop the empty window bar
+        defaultProps: { wrap: true, preserveIndent: true, overridesByLang: { 'bash,sh,shell,zsh,console': { frame: 'code' } } },
+        styleOverrides: {
+          borderRadius: '14px',
+          borderColor: 'var(--sl-color-gray-5)',
+          codeFontFamily: "'JetBrains Mono Variable', ui-monospace, Menlo, monospace",
+          codeFontSize: '0.84rem',
+          codeLineHeight: '1.6',
+          codePaddingBlock: '0.85rem',
+          codePaddingInline: '1.1rem',
+          frames: { frameBoxShadowCssValue: 'none', editorActiveTabIndicatorTopColor: 'transparent' },
+        },
+      },
       title: 'WaGo',
       description: 'Agent-first WhatsApp API in a single 21 MB Go binary.',
       logo: { light: '../docs/assets/logo.svg', dark: '../docs/assets/logo-dark.svg', replacesTitle: false },

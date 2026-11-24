@@ -4,28 +4,28 @@
     .muted { fill: #56626a; } .xs { font-size: 11.5px; } .s { font-size: 13px; }
     .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
   
-    .f-accent { fill: #0f7b6c; }
-    .f-accent2 { fill: #e1f1ee; }
+    .f-accent { fill: #0a6847; }
+    .f-accent2 { fill: #e2efe8; }
     .f-amber { fill: #f59e0b; }
     .f-bg { fill: #ffffff; }
     .f-card { fill: #f7f9fa; }
     .f-violet { fill: #475569; }
     .f-wa2 { fill: #dcf8c6; }
-    .s-accent { stroke: #0f7b6c; }
+    .s-accent { stroke: #0a6847; }
     .s-amber { stroke: #f59e0b; }
     .s-line { stroke: #c9d2d7; }
     .s-violet { stroke: #475569; }
     @media (prefers-color-scheme: dark) {
       text { font-family: "Golos Text", "Onest", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #e9eef0; }
       .muted { fill: #97a4ab; }
-      .f-accent { fill: #5cd0b8; }
-      .f-accent2 { fill: #12302b; }
+      .f-accent { fill: #3dbb85; }
+      .f-accent2 { fill: #102a20; }
       .f-amber { fill: #fbbf24; }
       .f-bg { fill: #172024; }
       .f-card { fill: #1d272c; }
       .f-violet { fill: #97a4ab; }
       .f-wa2 { fill: #103322; }
-      .s-accent { stroke: #5cd0b8; }
+      .s-accent { stroke: #3dbb85; }
       .s-amber { stroke: #fbbf24; }
       .s-line { stroke: #2f3b41; }
       .s-violet { stroke: #97a4ab; }

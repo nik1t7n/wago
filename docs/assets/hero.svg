@@ -8,38 +8,38 @@
     .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
     .card { fill: #f7f9fa; stroke: #c9d2d7; stroke-width: 1.2; }
     .flow { stroke: #56626a; stroke-width: 1.6; fill: none; }
-    .flowA { stroke: #0f7b6c; stroke-width: 2; fill: none; }
+    .flowA { stroke: #0a6847; stroke-width: 2; fill: none; }
   
-    .f-accent { fill: #0f7b6c; }
-    .f-accent2 { fill: #e1f1ee; }
+    .f-accent { fill: #0a6847; }
+    .f-accent2 { fill: #e2efe8; }
     .f-bg { fill: #ffffff; }
     .f-card { fill: #f7f9fa; }
     .f-line { fill: #c9d2d7; }
     .f-muted { fill: #56626a; }
     .f-violet2 { fill: #eef1f3; }
     .f-wa2 { fill: #dcf8c6; }
-    .s-accent { stroke: #0f7b6c; }
+    .s-accent { stroke: #0a6847; }
     .s-line { stroke: #c9d2d7; }
     .s-violet { stroke: #475569; }
-    .s-wa { stroke: #0f7b6c; }
+    .s-wa { stroke: #0a6847; }
     @media (prefers-color-scheme: dark) {
       text { font-family: "Golos Text", "Onest", ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif; fill: #e9eef0; }
       .muted { fill: #97a4ab; }
       .card { fill: #1d272c; stroke: #2f3b41; stroke-width: 1.2; }
       .flow { stroke: #97a4ab; stroke-width: 1.6; fill: none; }
-      .flowA { stroke: #5cd0b8; stroke-width: 2; fill: none; }
-      .f-accent { fill: #5cd0b8; }
-      .f-accent2 { fill: #12302b; }
+      .flowA { stroke: #3dbb85; stroke-width: 2; fill: none; }
+      .f-accent { fill: #3dbb85; }
+      .f-accent2 { fill: #102a20; }
       .f-bg { fill: #172024; }
       .f-card { fill: #1d272c; }
       .f-line { fill: #2f3b41; }
       .f-muted { fill: #97a4ab; }
       .f-violet2 { fill: #1b2429; }
       .f-wa2 { fill: #103322; }
-      .s-accent { stroke: #5cd0b8; }
+      .s-accent { stroke: #3dbb85; }
       .s-line { stroke: #2f3b41; }
       .s-violet { stroke: #97a4ab; }
-      .s-wa { stroke: #5cd0b8; }
+      .s-wa { stroke: #3dbb85; }
     }
   </style>
   <defs>

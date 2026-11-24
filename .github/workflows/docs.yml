@@ -30,6 +30,17 @@ jobs:
           cache-dependency-path: site/package-lock.json
       - run: npm ci
       - run: npm run build
+      # Pages caches HTML for ten minutes; keep the assets the live pages still reference so a cached page never
+      # loads without its styles while the new build takes over
+      - name: Keep the live site's assets
+        run: |
+          base=https://nik1t7n.github.io/wago
+          for p in "" $(cd dist && find . -mindepth 2 -name index.html | sed 's#^\./##; s#index.html$##'); do
+            curl -fsS "$base/$p" 2>/dev/null | grep -o '/wago/_astro/[^"]*' || true
+          done | sort -u | while read -r a; do
+            f="dist/${a#/wago/}"
+            [ -e "$f" ] || curl -fsS -o "$f" "https://nik1t7n.github.io$a" || true
+          done
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/dist
