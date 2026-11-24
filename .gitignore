@@ -1,0 +1,3 @@
+/wago
+*.sqlite3*
+/testdata/

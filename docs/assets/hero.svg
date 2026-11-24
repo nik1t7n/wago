@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="WhatsApp on a phone, linked to WaGo: a WAHA-compatible API, an agent layer and a SQLite mirror; your agent receives turns and replies">
+  <style>
+    :root { --bg:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#cbd5e1; --card:#f8fafc; --wa:#25d366; --wa2:#dcf8c6; --accent:#0ea5e9; --accent2:#e0f2fe; --violet:#8b5cf6; --violet2:#ede9fe; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#0d1117; --ink:#e6edf3; --muted:#8b949e; --line:#30363d; --card:#161b22; --wa:#2bd46a; --wa2:#103322; --accent:#38bdf8; --accent2:#0c2a3a; --violet:#a78bfa; --violet2:#231a3d; } }
+    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, sans-serif; fill: var(--ink); }
+    .muted { fill: var(--muted); }
+    .h { font-weight: 700; font-size: 17px; }
+    .s { font-size: 13px; }
+    .xs { font-size: 11.5px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+    .card { fill: var(--card); stroke: var(--line); stroke-width: 1.2; }
+    .flow { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+    .flowA { stroke: var(--accent); stroke-width: 2; fill: none; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker>
+  </defs>
+  <rect width="960" height="400" fill="var(--bg)"/>
+
+  <!-- phone -->
+  <rect x="36" y="70" width="150" height="270" rx="26" class="card"/>
+  <rect x="88" y="82" width="46" height="7" rx="3.5" fill="var(--line)"/>
+  <rect x="52" y="108" width="104" height="30" rx="12" fill="var(--card)" stroke="var(--line)"/>
+  <text x="62" y="127" class="xs">hi! open today?</text>
+  <rect x="52" y="146" width="118" height="30" rx="12" fill="var(--card)" stroke="var(--line)"/>
+  <text x="62" y="165" class="xs">🎤 voice · 0:07</text>
+  <rect x="76" y="190" width="96" height="30" rx="12" fill="var(--wa2)"/>
+  <text x="86" y="209" class="xs">Hi Ann! Yes,</text>
+  <rect x="64" y="228" width="108" height="30" rx="12" fill="var(--wa2)"/>
+  <text x="74" y="247" class="xs">till 8 pm today 🙂</text>
+  <text x="56" y="282" class="xs muted">typing…</text>
+  <text x="111" y="364" text-anchor="middle" class="s muted">WhatsApp</text>
+
+  <path d="M196 205 H262" class="flow" marker-end="url(#a)" marker-start="url(#a)"/>
+  <text x="229" y="194" text-anchor="middle" class="xs muted">linked</text>
+  <text x="229" y="224" text-anchor="middle" class="xs muted">device</text>
+
+  <!-- wago -->
+  <rect x="272" y="42" width="400" height="320" rx="18" fill="none" stroke="var(--wa)" stroke-width="2.2"/>
+  <text x="296" y="76" class="h">WaGo</text>
+  <text x="352" y="76" class="s muted">one Go binary · ~21 MB RAM</text>
+
+  <rect x="292" y="94" width="360" height="62" rx="12" class="card"/>
+  <text x="308" y="119" class="s" font-weight="600">WAHA-compatible REST · webhooks · WebSocket</text>
+  <text x="308" y="141" class="xs muted">same paths, ids and envelope: WAHA clients move by changing a URL</text>
+
+  <rect x="292" y="166" width="360" height="104" rx="12" fill="var(--accent2)" stroke="var(--accent)" stroke-width="1.2"/>
+  <text x="308" y="191" class="s" font-weight="600">Agent layer</text>
+  <g class="xs">
+    <rect x="308" y="202" width="70" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="343" y="218" text-anchor="middle">turns</text>
+    <rect x="384" y="202" width="84" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="426" y="218" text-anchor="middle">delivery</text>
+    <rect x="474" y="202" width="86" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="517" y="218" text-anchor="middle">ownership</text>
+    <rect x="566" y="202" width="72" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="602" y="218" text-anchor="middle">outbox</text>
+    <rect x="308" y="234" width="104" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="360" y="250" text-anchor="middle">voice → text</text>
+    <rect x="418" y="234" width="70" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="453" y="250" text-anchor="middle">context</text>
+    <rect x="494" y="234" width="64" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="526" y="250" text-anchor="middle">policy</text>
+    <rect x="564" y="234" width="74" height="24" rx="12" fill="var(--bg)" stroke="var(--accent)"/><text x="601" y="250" text-anchor="middle">replays</text>
+  </g>
+
+  <rect x="292" y="280" width="360" height="62" rx="12" class="card"/>
+  <text x="308" y="305" class="s" font-weight="600">Mirror · SQLite + full-text search</text>
+  <text x="308" y="327" class="xs muted">every message, reads in ms, works while offline</text>
+
+  <!-- agents -->
+  <path d="M682 196 H760" class="flowA" marker-end="url(#b)"/>
+  <text x="721" y="186" text-anchor="middle" class="mono" fill="var(--accent)">turn.ready</text>
+  <path d="M760 240 H682" class="flowA" marker-end="url(#b)"/>
+  <text x="721" y="262" text-anchor="middle" class="mono" fill="var(--accent)">reply</text>
+
+  <rect x="770" y="120" width="160" height="96" rx="14" fill="var(--violet2)" stroke="var(--violet)" stroke-width="1.4"/>
+  <text x="850" y="152" text-anchor="middle" class="s" font-weight="600">Your agent</text>
+  <text x="850" y="174" text-anchor="middle" class="xs muted">Python · TS · Go · any</text>
+  <text x="850" y="194" text-anchor="middle" class="xs muted">any model</text>
+  <rect x="770" y="232" width="160" height="66" rx="14" fill="var(--violet2)" stroke="var(--violet)" stroke-width="1.4"/>
+  <text x="850" y="261" text-anchor="middle" class="s" font-weight="600">MCP clients</text>
+  <text x="850" y="281" text-anchor="middle" class="xs muted">Claude · Codex · Cursor</text>
+</svg>

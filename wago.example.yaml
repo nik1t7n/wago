@@ -1,0 +1,87 @@
+# WaGo configuration. Copy to wago.yaml (or ~/.config/wago/wago.yaml) and keep only what you change:
+# every field has a working default. Environment variables (WAGO_*) override this file, flags override both.
+# Run `wago config` to print the effective configuration with secrets hidden.
+
+listen: 127.0.0.1:3000          # keep it on loopback or a private network; put a reverse proxy in front if needed
+home: ~/.local/share/wago       # device keys, sessions, mirrors, file cache (macOS default: ~/Library/Application Support/wago)
+publicUrl: http://127.0.0.1:3000 # base of media links handed to clients (WAHA_BASE_URL works too)
+apiKey: env:WAGO_API_KEY        # env:NAME | file:/run/secrets/wago | keychain:SERVICE[/ACCOUNT] (macOS)
+deviceName: WaGo                # how the linked device appears on the phone
+logLevel: WARN
+memoryMb: 96                    # soft limit for the Go heap
+devFake: false                  # development: every session is a stand-in, nothing reaches WhatsApp
+
+# Server-wide webhooks, added to every session (WAHA's WHATSAPP_HOOK_* variables are read as well).
+webhooks:
+  - url: http://127.0.0.1:8080/hook
+    events: [turn.ready, chat.owner, outbox.failed, policy.warning]
+    hmac: {key: change-me}
+    retries: {policy: exponential, delaySeconds: 2, attempts: 6}
+
+# Media understanding: named processors, chosen per session in agent.understand.
+processors:
+  whisper:
+    type: transcribe            # OpenAI-compatible /audio/transcriptions
+    url: https://api.openai.com/v1
+    model: whisper-1
+    apiKey: env:OPENAI_API_KEY
+  eyes:
+    type: vision                # OpenAI-compatible /chat/completions with an image
+    url: https://integrate.api.nvidia.com/v1
+    model: meta/llama-3.2-11b-vision-instruct
+    apiKey: env:NVIDIA_API_KEY
+  # local:
+  #   type: command             # a local program; {file} is replaced by a temporary file, stdout is the text
+  #   command: [whisper-cli, -m, /models/ggml-base.bin, -nt, -f, "{file}"]
+  # mine:
+  #   type: http                # your service: the file is POSTed as the body, {"text": ...} comes back
+  #   url: http://ocr.internal/understand
+
+# Defaults for every session's agent block (a session's own block overrides field by field).
+agent:
+  enabled: false                # turn on per session: PUT /api/sessions/{s} {"config": {"agent": {"enabled": true}}}
+  mode: live                    # live | shadow (everything runs, nothing is sent)
+  turn:
+    quietMs: 2500               # the turn is ready after this long without a new message
+    typingGraceMs: 8000         # while the person types, wait up to this long more
+    maxWaitMs: 30000            # never wait longer than this after the first message
+    replyTimeoutSec: 600        # an unanswered turn expires
+    groups: false               # turns in group chats too
+    maxAgeSec: 600              # older messages (after a long offline spell) start no turn
+    supersedeOnReply: true      # a new message stops the reply being typed
+  delivery:
+    seen: true
+    seenDelayMs: 1200
+    typing: true
+    charsPerSecond: 14
+    minTypingMs: 900
+    maxTypingMs: 9000
+    pauseMs: 900                # between parts
+    jitter: 0.3                 # ±30% on every pause
+  ownership:
+    handbackMinutes: 30         # a person who answered from a device keeps the chat this long after their last message
+    humanDevices: any           # any | phone
+    whileHuman: pause           # pause | observe
+  understand:
+    audio: whisper
+    image: eyes
+    timeoutMs: 20000
+  context:
+    messages: 20
+    chars: 4000
+  outbox:
+    maxAttempts: 8
+    parallel: 8
+
+# Defaults for every session's number policy. Off unless enabled; once enabled these careful values apply.
+policy:
+  enabled: false
+  perMinute: 12
+  perHour: 200
+  perDay: 1000
+  perChatPerMinute: 6
+  newChatsPerDay: 20
+  coldOutreach: block           # block | allow
+  # quietHours: {from: "22:00", to: "08:00", timezone: Europe/Berlin, allowReplies: true}
+  # allow: ["4930*"]
+  # block: []

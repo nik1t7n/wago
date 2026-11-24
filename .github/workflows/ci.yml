@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: ffmpeg (voice and video conversion tests)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: vet
+        run: go vet -tags sqlite_fts5 .
+      - name: test
+        run: go test -race -count=1 -tags sqlite_fts5 .
+      - name: build
+        run: go build -trimpath -tags sqlite_fts5 -o wago .
+      - name: WAHA conformance against a fake server
+        run: |
+          WAGO_API_KEY=ci ./wago -dev-fake -home "$RUNNER_TEMP/wago" -addr 127.0.0.1:3999 &
+          for i in $(seq 50); do curl -fs http://127.0.0.1:3999/health >/dev/null && break; sleep 0.2; done
+          python3 conformance/waha_conformance.py --url http://127.0.0.1:3999 --key ci
+      - name: example config is valid
+        run: ./wago config -config wago.example.yaml >/dev/null
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t wago .
