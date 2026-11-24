@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -162,6 +164,9 @@ func TestDevFakeNewSessions(t *testing.T) {
 	}
 	if code := post(t, srv, "POST", "/api/probe-1/dev/incoming", map[string]any{"chatId": "996700000002@c.us", "text": "hi"}, &out); code != 200 && code != 201 {
 		t.Fatal("dev/incoming", code, out)
+	}
+	if code := post(t, srv, "POST", "/api/probe-1/auth/request-code", map[string]any{"phoneNumber": "996700000002"}, &out); code != 422 || !strings.Contains(fmt.Sprint(out), StatusWorking) {
+		t.Fatal("a pairing code on a linked session names its real state", code, out)
 	}
 	s.fake = nil
 	if err := s.Start(); err == nil {

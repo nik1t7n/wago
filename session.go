@@ -238,12 +238,13 @@ func (s *Session) qrLoop(qrc <-chan whatsmeow.QRChannelItem) {
 
 // PairCode links by phone number instead of QR: WhatsApp shows a notification, the owner types the code.
 func (s *Session) PairCode(ctx context.Context, phone string) (string, error) {
-	cli := s.Client()
-	if cli == nil {
-		return "", errors.New("session is not started")
-	}
+	// the state decides first: a linked or stopped session gets its real status, whatever engine runs it
 	if st, _, _ := s.Status(); st != StatusQR {
 		return "", fmt.Errorf("session is %s; a code is only possible while it waits for pairing", st)
+	}
+	cli := s.Client()
+	if cli == nil {
+		return "", errors.New("session has no WhatsApp connection to pair")
 	}
 	phone = strings.TrimLeft(phone, "+ ")
 	return cli.PairPhone(ctx, phone, true, whatsmeow.PairClientChrome, "Chrome (WaGo)")
