@@ -18,7 +18,7 @@ types replies out like a human, steps aside when you answer from your phone, and
 <p align="center">
 <a href="https://github.com/nik1t7n/wago/actions/workflows/ci.yml"><img src="https://github.com/nik1t7n/wago/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <img src="https://img.shields.io/badge/go-1.27-00ADD8" alt="Go 1.27">
-<img src="https://img.shields.io/badge/RAM-21%20MB-25d366" alt="about 21 MB of RAM">
+<img src="docs/assets/badge-ram.svg" alt="RAM 21 MB">
 <img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="Apache-2.0">
 </p>
 
