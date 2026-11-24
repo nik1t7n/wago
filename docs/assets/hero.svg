@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="WhatsApp on a phone, linked to WaGo: a WAHA-compatible API, an agent layer and a SQLite mirror; your agent receives turns and replies">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-label="WhatsApp on a phone, linked to WaGo: an API, an agent layer and a full message history; your agent receives turns and replies">
   <style>
     text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, sans-serif; fill: #0f172a; }
     .muted { fill: #64748b; }
@@ -72,8 +72,8 @@
   <text x="352" y="76" class="s muted">one Go binary · ~21 MB RAM</text>
 
   <rect x="292" y="94" width="360" height="62" rx="12" class="card"/>
-  <text x="308" y="119" class="s" font-weight="600">WAHA-compatible REST · webhooks · WebSocket</text>
-  <text x="308" y="141" class="xs muted">same paths, ids and webhooks as WAHA: just change the URL</text>
+  <text x="308" y="119" class="s" font-weight="600">REST · webhooks · WebSocket</text>
+  <text x="308" y="141" class="xs muted">one event per turn in, one call to reply out</text>
 
   <rect class="f-accent2 s-accent" x="292" y="166" width="360" height="104" rx="12" stroke-width="1.2"/>
   <text x="308" y="191" class="s" font-weight="600">Agent layer</text>

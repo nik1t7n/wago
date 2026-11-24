@@ -1,7 +1,8 @@
 # API reference
 
-WaGo speaks WAHA's REST API, webhook envelope and ids, and adds the agent layer (turns, outbox, ownership, context,
-policy, replays). This page is the full reference; the agent layer's behaviour is explained in [AGENTS.md](AGENTS.md).
+Every route, event and error of WaGo: sessions, history, media, actions, webhooks, and the agent layer (turns,
+outbox, ownership, context, policy, replays). The agent layer's behaviour is explained in [AGENTS.md](AGENTS.md).
+Paths, ids and the webhook envelope follow WAHA's conventions, so WAHA clients work unchanged.
 
 API version: **1** (`GET /api/version` → `{"version": "0.2.0", "api": "1", ...}`). Within a major API version,
 fields, routes and events are only added, never removed or renamed. See [CHANGELOG.md](../CHANGELOG.md).
