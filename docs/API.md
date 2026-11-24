@@ -1,7 +1,7 @@
 # API reference
 
 Every route, event and error of WaGo: sessions, history, media, actions, webhooks, and the agent layer (turns,
-outbox, ownership, context, policy, replays). The agent layer's behaviour is explained in [AGENTS.md](AGENTS.md).
+outbox, ownership, context, policy, replays). The agent layer's behaviour is explained in [AGENT-LAYER.md](AGENT-LAYER.md).
 Paths, ids and the webhook envelope follow WAHA's conventions, so WAHA clients work unchanged.
 
 API version: **1** (`GET /api/version` → `{"version": "0.2.0", "api": "1", ...}`). Within a major API version,
@@ -65,7 +65,7 @@ Session config:
 
 - `sending` gates everything that changes something on WhatsApp (see Actions). It is off by default: turning it on is
   the number owner's decision.
-- `agent` and `policy` are described in [AGENTS.md](AGENTS.md) and [CONFIG.md](CONFIG.md). Only the fields given
+- `agent` and `policy` are described in [AGENT-LAYER.md](AGENT-LAYER.md) and [CONFIG.md](CONFIG.md). Only the fields given
   override the server defaults.
 - A config sent without `sending`, `agent` or `policy` (as every WAHA client does on start) keeps their current
   values.

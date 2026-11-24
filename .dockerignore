@@ -3,3 +3,6 @@ testdata
 reports
 *.sqlite3*
 .git
+site/
+examples/
+conformance/

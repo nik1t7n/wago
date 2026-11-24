@@ -8,11 +8,13 @@ types replies out like a human, steps aside when you answer from your phone, and
 </p>
 
 <p align="center">
+<a href="https://nik1t7n.github.io/wago/"><b>Docs</b></a> ·
 <a href="#quickstart">Quickstart</a> ·
-<a href="docs/AGENTS.md">How it works</a> ·
+<a href="docs/AGENT-LAYER.md">How it works</a> ·
 <a href="docs/API.md">API</a> ·
 <a href="docs/CONFIG.md">Configuration</a> ·
-<a href="examples">Examples</a>
+<a href="examples">Examples</a> ·
+<a href="AGENTS.md">For AI agents</a>
 </p>
 
 <p align="center">
@@ -129,7 +131,7 @@ POST /api/default/turns/t_3f1c…/reply
 ```
 
 That's the whole contract. A `409` means the person wrote again or a human took over: do nothing, the next turn is
-already on its way. The full guide: [AGENTS.md](docs/AGENTS.md).
+already on its way. The full guide: [AGENT-LAYER.md](docs/AGENT-LAYER.md).
 
 ## Plug in any agent
 
@@ -144,6 +146,18 @@ and works with any OpenAI-compatible model.
 
 **Coming from WAHA?** WaGo speaks the WAHA API, so existing clients switch by changing the URL. See
 [MIGRATION.md](docs/MIGRATION.md).
+
+## For AI agents
+
+WaGo is built to be set up and driven by an agent. [`AGENTS.md`](AGENTS.md) is written for models: setup, the rules,
+the reply contract, recipes and troubleshooting in one page (Claude Code, Codex and Cursor pick it up on their own),
+and [`llms.txt`](llms.txt) indexes the docs. Hand your coding agent this:
+
+```text
+Set up WaGo (https://github.com/nik1t7n/wago) for me. Read its AGENTS.md first and follow its rules.
+Run it with -dev-fake, connect my agent's webhook to turn.ready, and prove the loop with /dev/incoming.
+Then show me how to link my phone. Do not turn on sending or message real people without asking me.
+```
 
 ## Make it yours
 
@@ -192,9 +206,12 @@ Report vulnerabilities privately, see [SECURITY.md](SECURITY.md).
 
 ## Documentation
 
+Everything below is also a searchable site: **[nik1t7n.github.io/wago](https://nik1t7n.github.io/wago/)**.
+
 | | |
 |---|---|
-| [AGENTS.md](docs/AGENTS.md) | turns, delivery, ownership, outbox, understanding, policy, replays |
+| [AGENTS.md](AGENTS.md) | for AI agents: setup, rules, the reply contract, recipes |
+| [AGENT-LAYER.md](docs/AGENT-LAYER.md) | turns, delivery, ownership, outbox, understanding, policy, replays |
 | [API.md](docs/API.md) | every route, event and error |
 | [CONFIG.md](docs/CONFIG.md) | file, environment, flags, secrets, files on disk |
 | [DESIGN.md](docs/DESIGN.md) | why it is built this way, with measurements |

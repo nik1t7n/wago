@@ -92,7 +92,7 @@ the same keys.
 A replay runs the real engine on a clock that runs N times faster. The alternative, a discrete-event simulator that
 jumps to the next due time, would be exact but cannot include the agent's real latency, which is part of what a
 replay should show. The scaled clock keeps the agent real; the trade-off is that scheduling noise is magnified by
-the speed, documented in [AGENTS.md](AGENTS.md).
+the speed, documented in [AGENT-LAYER.md](AGENT-LAYER.md).
 
 ## Testing
 

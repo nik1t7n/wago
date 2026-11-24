@@ -1,0 +1,29 @@
+# WaGo
+
+> Agent-first WhatsApp API server in a single 21 MB Go binary. It links to a WhatsApp account as a linked device,
+> keeps every message in a local SQLite mirror, and gives an AI agent one `turn.ready` event per turn and one call to
+> reply, while it handles typing, read receipts, message bursts, voice-to-text, human takeover, a durable outbox and
+> number-safety limits. WAHA-compatible REST, webhooks and WebSocket.
+
+Start with AGENTS.md: it has the setup, the rules an agent must follow (sending is the owner's decision; test with
+`-dev-fake` first), the reply contract and troubleshooting.
+
+## Docs
+
+- [AGENTS.md](https://github.com/nik1t7n/wago/blob/main/AGENTS.md): guide for AI agents using or changing WaGo
+- [Agent layer](https://github.com/nik1t7n/wago/blob/main/docs/AGENT-LAYER.md): turns, delivery, ownership, outbox, understanding, policy, replays
+- [API reference](https://github.com/nik1t7n/wago/blob/main/docs/API.md): every route, event and error
+- [Configuration](https://github.com/nik1t7n/wago/blob/main/docs/CONFIG.md): file, environment, flags, secrets
+- [Example config](https://github.com/nik1t7n/wago/blob/main/wago.example.yaml): every field with its default
+
+## Examples
+
+- [Python webhook agent](https://github.com/nik1t7n/wago/blob/main/examples/python-webhook/agent.py)
+- [TypeScript webhook agent](https://github.com/nik1t7n/wago/blob/main/examples/typescript-webhook/agent.ts)
+- [MCP server](https://github.com/nik1t7n/wago/blob/main/examples/mcp-python/server.py): tools for Claude, Codex, Cursor
+
+## Optional
+
+- [Full docs as one file](https://nik1t7n.github.io/wago/llms-full.txt)
+- [Design notes](https://github.com/nik1t7n/wago/blob/main/docs/DESIGN.md)
+- [Moving from WAHA](https://github.com/nik1t7n/wago/blob/main/docs/MIGRATION.md)

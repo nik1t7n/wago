@@ -31,7 +31,7 @@ default. The file and the REST API use the same keys, so an `agent` block copied
 | mirror of the `default` session | `mirror` | `WAGO_MIRROR` | `-mirror` | inside `home` |
 | server-wide webhook | `webhooks` | `WHATSAPP_HOOK_URL`, `_EVENTS`, `_HMAC_KEY`, `_RETRIES_POLICY`, `_RETRIES_DELAY_SECONDS`, `_RETRIES_ATTEMPTS`, `_CUSTOM_HEADERS` | | none |
 | media processors | `processors` | | | none |
-| agent defaults | `agent` | | | see [AGENTS.md](AGENTS.md) |
+| agent defaults | `agent` | | | see [AGENT-LAYER.md](AGENT-LAYER.md) |
 | policy defaults | `policy` | | | off |
 
 The `WAHA_*` and `WHATSAPP_HOOK_*` names are WAHA's own, so a WAHA deployment's environment works unchanged.
