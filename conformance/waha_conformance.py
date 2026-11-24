@@ -21,6 +21,7 @@ import sys
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -177,6 +178,8 @@ def main():
             p = ev["payload"]
             check("... from the chat, fromMe false", p.get("from") == CHAT and p.get("fromMe") is False, p)
             check("... with _data.notifyName", (p.get("_data") or {}).get("notifyName") == "Conf", p.get("_data"))
+        code, ct = api("GET", "/api/contacts?" + urllib.parse.urlencode({"session": s, "contactId": CHAT}))
+        check("the sender's contact has their pushname", code == 200 and ct.get("pushname") == "Conf", (code, ct))
         dev({"chatId": CHAT, "edit": iid, "text": "hello, edited"})
         _, _, ev = hooks.wait("message.edited", lambda p: p.get("editedMessageId") == iid)
         check("an incoming edit arrives with editedMessageId and body", ev is not None and ev["payload"].get("body") == "hello, edited")
@@ -193,6 +196,8 @@ def main():
     api("POST", f"/api/sessions/{s}/stop")
     code, _ = api("POST", "/api/sendText", {"session": s, "chatId": CHAT, "text": "x"})
     check("a stopped session refuses to send with 422", code == 422, code)
+    code, ct = api("GET", "/api/contacts?" + urllib.parse.urlencode({"session": s, "contactId": "15550000000@c.us"}))
+    check("a number nobody saved is still a contact, not 404", code == 200 and ct.get("id") == "15550000000@c.us", (code, ct))
     api("DELETE", f"/api/sessions/{s}")
     return finish()
 

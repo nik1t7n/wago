@@ -27,6 +27,8 @@ The agent layer.
 - **Configuration.** `wago.yaml`, `WAGO_*` environment variables and flags in layers over defaults; secret references
   `env:`, `file:` and `keychain:`; `wago config` prints the effective result. Server-wide webhooks and WAHA's
   `WHATSAPP_HOOK_*` variables.
+- `GET /api/contacts` answers for any number, saved or not (WAHA does too), and both contact routes return
+  `pushname`, the name a person set for themselves, from the live address book or their latest message.
 - Edits, deletes, reactions and other changes made from our own account now emit their events.
 - `-dev-fake` gives every session a recording stand-in; `/dev/incoming` plays voice notes, photos, typing and
   messages from the owner's devices.

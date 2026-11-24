@@ -81,7 +81,7 @@ All reads come from the mirror: they work while the session is stopped and take 
 | `GET /api/{s}/chats/{chat}/messages` | `limit`, `offset`, `filter.timestamp.gte/lte`, `filter.fromMe`, `sortOrder=asc\|desc` |
 | `GET /api/{s}/chats/{chat}/messages/{id}` | one message |
 | `GET /api/{s}/search` | full-text search over all chats: `q`, optional `chatId`, `from`, `to` (unix), `rank=true`, `limit` |
-| `GET /api/contacts/all?session=`, `/api/contacts?session=&contactId=` | contacts |
+| `GET /api/contacts/all?session=`, `/api/contacts?session=&contactId=` | contacts: `name` from the address book, `pushname` the person's own profile name, `number`, `lid`; any number answers, saved or not |
 | `GET /api/contacts/check-exists?session=&phone=` | is the number on WhatsApp |
 | `GET /api/contacts/about`, `/api/contacts/profile-picture` | `?session=&contactId=`; picture cached 24 h, `refresh=true` |
 | `GET /api/{s}/chats/{chat}/picture` (link), `/avatar` (image bytes, 204 if none) | |

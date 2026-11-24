@@ -210,3 +210,34 @@ func TestOwnChangesEmitEvents(t *testing.T) {
 		t.Fatal(seen)
 	}
 }
+
+// A WAHA client asks for the contact of anyone who writes, saved in the address book or not: the answer is never a
+// 404, and the person's own profile name comes back as pushname.
+func TestContactOfAnyNumber(t *testing.T) {
+	mg, srv := testManager(t)
+	s := mg.get("default")
+	s.fake = &fakeConn{fixed: true}
+	s.Start()
+	chat := "996700000777@c.us"
+	if code := post(t, srv, "POST", "/api/default/dev/incoming", map[string]any{"chatId": chat, "text": "hi", "pushName": "Ann Petrova"}, nil); code != 200 && code != 201 {
+		t.Fatal("dev/incoming", code)
+	}
+	m, _ := s.Mirror()
+	m.Flush()
+	var c map[string]any
+	if code := get(t, srv, "/api/contacts?session=default&contactId="+chat, "secret", &c); code != 200 || c["pushname"] != "Ann Petrova" || c["number"] != "996700000777" || c["id"] != chat {
+		t.Fatal("a new person's contact", code, c)
+	}
+	if code := get(t, srv, "/api/contacts?session=default&contactId=996700000778", "secret", &c); code != 200 || c["name"] != nil || c["pushname"] != nil || c["id"] != "996700000778@c.us" {
+		t.Fatal("a number with no history is still a contact", code, c)
+	}
+	var all []map[string]any
+	if code := get(t, srv, "/api/contacts/all?session=default", "secret", &all); code != 200 || len(all) == 0 {
+		t.Fatal("contacts/all", code)
+	}
+	for _, x := range all {
+		if _, ok := x["pushname"]; !ok {
+			t.Fatal("every listed contact carries pushname", x)
+		}
+	}
+}

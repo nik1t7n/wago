@@ -379,24 +379,99 @@ func (s *Session) contacts(ctx context.Context, p page) ([]map[string]any, error
 	if err != nil {
 		return nil, err
 	}
-	rows, err := m.r.QueryContext(ctx, `SELECT c.jid, c.name, (SELECT alias FROM aliases WHERE canonical=c.jid LIMIT 1)
-		FROM contacts c WHERE c.jid NOT LIKE '%@lid' OR c.jid NOT IN (SELECT alias FROM aliases) ORDER BY c.name LIMIT ? OFFSET ?`, p.limit, p.offset)
+	rows, err := m.r.QueryContext(ctx, `SELECT c.jid FROM contacts c
+		WHERE c.jid NOT LIKE '%@lid' OR c.jid NOT IN (SELECT alias FROM aliases) ORDER BY c.name LIMIT ? OFFSET ?`, p.limit, p.offset)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	out := []map[string]any{}
+	var ids []string
 	for rows.Next() {
-		var id, name string
-		var lid sql.NullString
-		rows.Scan(&id, &name, &lid)
-		item := map[string]any{"id": id, "name": name, "pushname": nil, "isGroup": strings.HasSuffix(id, "@g.us"), "lid": nullable(lid.String)}
-		if strings.HasSuffix(id, "@c.us") {
-			item["number"] = strings.TrimSuffix(id, "@c.us")
-		}
-		out = append(out, item)
+		var id string
+		rows.Scan(&id)
+		ids = append(ids, id)
+	}
+	rows.Close()
+	book := s.addressBook(ctx)
+	out := make([]map[string]any, 0, len(ids))
+	for _, id := range ids {
+		out = append(out, s.contactWith(ctx, id, book))
 	}
 	return out, rows.Err()
+}
+
+// contact is WAHA's contact for any id, saved or not (WAHA answers an unknown number too): name is the name in the
+// owner's address book, pushname the name the person set for themselves.
+func (s *Session) contact(ctx context.Context, id string) map[string]any {
+	return s.contactWith(ctx, id, nil)
+}
+
+// addressBook reads every contact whatsmeow keeps, for listing many at once; nil when the session is not linked.
+func (s *Session) addressBook(ctx context.Context) map[types.JID]types.ContactInfo {
+	cli := s.Client()
+	if cli == nil || cli.Store == nil || cli.Store.Contacts == nil {
+		return nil
+	}
+	all, err := cli.Store.Contacts.GetAllContacts(ctx)
+	if err != nil {
+		return nil
+	}
+	return all
+}
+
+func (s *Session) contactWith(ctx context.Context, id string, book map[types.JID]types.ContactInfo) map[string]any {
+	var name, push, lid string
+	stored := ""
+	if m, err := s.Mirror(); err == nil {
+		m.r.QueryRowContext(ctx, "SELECT name FROM contacts WHERE jid=?", id).Scan(&stored)
+		m.r.QueryRowContext(ctx, "SELECT alias FROM aliases WHERE canonical=? LIMIT 1", id).Scan(&lid)
+		if strings.HasSuffix(id, "@g.us") {
+			m.r.QueryRowContext(ctx, "SELECT COALESCE(name,'') FROM chats WHERE chat_id=?", id).Scan(&stored)
+		} else {
+			// the name the person signed their latest message with, kept even while the session is stopped
+			m.r.QueryRowContext(ctx, `SELECT sender_name FROM messages WHERE chat_id=? AND from_me=0 AND COALESCE(sender_name,'')<>''
+				ORDER BY ts DESC LIMIT 1`, id).Scan(&push)
+		}
+	}
+	// whatsmeow's own store tells a saved name from a push name; it may know the person by number or by lid
+	linked := false
+	if cli := s.Client(); cli != nil && cli.Store != nil && cli.Store.Contacts != nil {
+		linked = true
+		for _, raw := range []string{id, lid} {
+			j, err := parseChatID(raw)
+			if raw == "" || err != nil {
+				continue
+			}
+			var c types.ContactInfo
+			if book != nil {
+				c = book[j]
+			} else if c, err = cli.Store.Contacts.GetContact(ctx, j); err != nil {
+				continue
+			}
+			if name == "" {
+				name = c.FullName
+				if name == "" {
+					name = c.FirstName
+				}
+			}
+			if c.PushName != "" {
+				push = c.PushName
+			}
+			if push == "" && c.BusinessName != "" {
+				push = c.BusinessName
+			}
+		}
+	}
+	if !linked || strings.HasSuffix(id, "@g.us") {
+		// without the live store the mirror's name is the best known, saved or not
+		name = stored
+	}
+	out := map[string]any{"id": id, "name": nullable(name), "pushname": nullable(push), "shortName": nullable(name),
+		"isGroup": strings.HasSuffix(id, "@g.us"), "isUser": strings.HasSuffix(id, "@c.us") || strings.HasSuffix(id, "@lid"),
+		"isMyContact": name != "" && !strings.HasSuffix(id, "@g.us"), "lid": nullable(lid)}
+	if strings.HasSuffix(id, "@c.us") {
+		out["number"] = strings.TrimSuffix(id, "@c.us")
+	}
+	return out
 }
 
 func (s *Session) lids(ctx context.Context, p page) ([]map[string]string, error) {

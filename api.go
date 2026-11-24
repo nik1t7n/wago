@@ -389,16 +389,11 @@ func (mg *Manager) routes() {
 		return ok(w, v)
 	}))
 	rt.add("GET", "/api/contacts", with(func(w http.ResponseWriter, r *http.Request, s *Session, _ params) error {
-		id := s.canonChat(r.URL.Query().Get("contactId"))
-		m, err := s.Mirror()
-		if err != nil {
-			return err
+		id := r.URL.Query().Get("contactId")
+		if id == "" {
+			return httpError{400, "contactId is required"}
 		}
-		var name string
-		if err := m.r.QueryRowContext(r.Context(), "SELECT name FROM contacts WHERE jid=?", id).Scan(&name); err != nil {
-			return err
-		}
-		return ok(w, map[string]any{"id": id, "name": name, "number": strings.TrimSuffix(id, "@c.us")})
+		return ok(w, s.contact(r.Context(), s.canonChat(id)))
 	}))
 	rt.add("GET", "/api/contacts/check-exists", with(func(w http.ResponseWriter, r *http.Request, s *Session, _ params) error {
 		cli := s.Client()
